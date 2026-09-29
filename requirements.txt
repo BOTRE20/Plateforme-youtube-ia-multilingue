@@ -1,0 +1,13 @@
+streamlit
+requests
+beautifulsoup4
+deep-translator
+lxml
+openai-whisper
+gtts
+torch
+numpy
+soundfile
+transformers
+urllib3
+
