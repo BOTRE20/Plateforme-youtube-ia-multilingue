@@ -3,6 +3,9 @@
 Application Streamlit pour **rechercher et regarder des vidéos YouTube et TikTok**, **traduire leurs titres** et **doubler automatiquement des vidéos** dans plus de 80 langues, dont des langues africaines (Éwé, Yoruba, Shona, Akan).
 
  Démo : 
+ https://youtube-ia.streamlit.app
+https://youtube-ia-p8li.onrender.com
+
 ---
 
 ##  Fonctionnalités
