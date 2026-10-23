@@ -10,7 +10,6 @@ from datetime import datetime
 from deep_translator import GoogleTranslator
 import os
 
-
 import tempfile
 import math
 import subprocess
@@ -1051,6 +1050,10 @@ st.markdown("---")
 st.markdown(
     "<div style='text-align: center; color: #6c757d; padding: 1rem;'>"
     "🎬 MediaFusion • YouTube & TikTok • Traduction IA (80 langues) • Doublage (Ewe, Yoruba, Shona, Akan inclus)"
+
+    "<div style='text-align: center; color: #007bff; padding: 1rem;'>"
+    "By BOTRE LARE Aboudou"
     "</div>",
+    
     unsafe_allow_html=True
 )
