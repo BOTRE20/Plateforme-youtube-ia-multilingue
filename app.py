@@ -376,6 +376,7 @@ langues_traduction = {
     "Telugu": "te",
     "Thaï": "th",
     "Filipino": "tl",
+    
     "Turc": "tr",
     "Ukrainien": "uk",
     "Ourdou": "ur",
