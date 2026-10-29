@@ -760,7 +760,7 @@ if st.session_state.page == 'accueil':
 
     if st.session_state.favorites:
         st.markdown("---")
-        st.markdown("## ✨ Recommandé pour vous")
+        st.markdown("##  Recommandé pour vous")
         fav_channels = list(set([v['channel'] for v in st.session_state.favorites]))
         if fav_channels:
             random_channel = random.choice(fav_channels)
@@ -803,7 +803,7 @@ elif st.session_state.page == 'favoris':
         display_video_grid(st.session_state.favorites, cols=3, source='favorites')
     else:
         st.info("Vous n'avez pas encore de vidéos favorites. Ajoutez-en en cliquant sur ☆ Ajouter.")
-        st.markdown("### 🎬 Suggestions")
+        st.markdown("###  Suggestions")
         with st.spinner("Chargement..."):
             suggestions = get_trending_videos(6)
         if suggestions:
@@ -859,7 +859,7 @@ elif st.session_state.page == 'lecture' and st.session_state.selected_video:
                 else:
                     st.button(" Suivant (fin)", disabled=True, use_container_width=True)
             else:
-                if st.button("🏠 Accueil", use_container_width=True):
+                if st.button(" Accueil", use_container_width=True):
                     st.session_state.page = 'accueil'
                     st.session_state.selected_video = None
                     st.rerun()
