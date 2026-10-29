@@ -376,7 +376,7 @@ langues_traduction = {
     "Telugu": "te",
     "Thaï": "th",
     "Filipino": "tl",
-    
+
     "Turc": "tr",
     "Ukrainien": "uk",
     "Ourdou": "ur",
@@ -684,31 +684,31 @@ with st.sidebar:
     st.markdown('<div style="font-size: 1.5rem; font-weight: 700; color: #FF0000; text-align: center; padding: 1rem; margin-bottom: 1rem;"> Media Fusion</div>', unsafe_allow_html=True)
 
     # Navigation avec icônes
-    if st.button("🏠 Accueil", use_container_width=True):
+    if st.button(" Accueil", use_container_width=True):
         st.session_state.page = 'accueil'
         st.session_state.selected_video = None
         st.rerun()
-    if st.button("🔍 Rechercher", use_container_width=True):
+    if st.button("Rechercher", use_container_width=True):
         st.session_state.page = 'recherche'
         st.session_state.selected_video = None
         st.rerun()
-    if st.button("❤️ Favoris", use_container_width=True):
+    if st.button(" Favoris", use_container_width=True):
         st.session_state.page = 'favoris'
         st.session_state.selected_video = None
         st.rerun()
-    if st.button("🎧 Traducteur vidéo IA", use_container_width=True):
+    if st.button(" Traducteur vidéo IA", use_container_width=True):
         st.session_state.page = 'traducteur'
         st.session_state.selected_video = None
         st.rerun()
 
     st.markdown("---")
-    st.markdown(f"**⭐ Favoris :** {len(st.session_state.favorites)}")
+    st.markdown(f"** Favoris :** {len(st.session_state.favorites)}")
 
     if st.session_state.selected_video:
         st.markdown("---")
-        st.markdown("**📺 En cours :**")
+        st.markdown("** En cours :**")
         st.markdown(f"*{st.session_state.selected_video['title'][:50]}...*")
-        if st.button("⏯️ Reprendre", use_container_width=True):
+        if st.button(" Reprendre", use_container_width=True):
             st.session_state.page = 'lecture'
             st.rerun()
 
@@ -769,7 +769,7 @@ if st.session_state.page == 'accueil':
                 display_video_grid(rec_videos, cols=3, source='accueil')
 
 elif st.session_state.page == 'recherche':
-    st.markdown("## 🔎 Recherche multi-plateformes")
+    st.markdown("##  Recherche multi-plateformes")
 
     plateforme = st.radio(
         "Choisissez la plateforme :",
@@ -797,7 +797,7 @@ elif st.session_state.page == 'recherche':
         st.info("Entrez un mot-clé pour commencer la recherche.")
 
 elif st.session_state.page == 'favoris':
-    st.markdown("## ❤️ Mes favoris")
+    st.markdown("## Mes favoris")
 
     if st.session_state.favorites:
         display_video_grid(st.session_state.favorites, cols=3, source='favorites')
@@ -824,7 +824,7 @@ elif st.session_state.page == 'lecture' and st.session_state.selected_video:
         with st.spinner("Chargement de la vidéo..."):
             afficher_video(video)
 
-        badge = "📺 YouTube" if platform == 'youtube' else "🎵 TikTok"
+        badge = " YouTube" if platform == 'youtube' else "🎵 TikTok"
         titre_affiche = video['title']
         if st.session_state.translated_title:
             titre_affiche = st.session_state.translated_title
@@ -846,13 +846,13 @@ elif st.session_state.page == 'lecture' and st.session_state.selected_video:
                     st.session_state.favorites.append(video)
                     st.rerun()
         with col_b:
-            if st.button("🔄 Partager", use_container_width=True):
+            if st.button("Partager", use_container_width=True):
                 st.info(f"Lien : {video['url']}")
         with col_c:
             if platform == 'tiktok' and st.session_state.current_list_source == 'search' and st.session_state.search_results:
                 current_idx = st.session_state.current_video_index
                 if current_idx < len(st.session_state.search_results) - 1:
-                    if st.button("⏩ Suivant", use_container_width=True):
+                    if st.button(" Suivant", use_container_width=True):
                         st.session_state.current_video_index = current_idx + 1
                         st.session_state.selected_video = st.session_state.search_results[current_idx + 1]
                         st.rerun()
@@ -871,7 +871,7 @@ elif st.session_state.page == 'lecture' and st.session_state.selected_video:
                 nav_col1, nav_col2, nav_col3 = st.columns([1, 2, 1])
                 with nav_col1:
                     if current_idx > 0:
-                        if st.button("⬆️ Précédent", key="prev_tiktok", use_container_width=True):
+                        if st.button(" Précédent", key="prev_tiktok", use_container_width=True):
                             st.session_state.current_video_index = current_idx - 1
                             st.session_state.selected_video = search_results[current_idx - 1]
                             st.rerun()
@@ -879,12 +879,12 @@ elif st.session_state.page == 'lecture' and st.session_state.selected_video:
                     st.markdown(f"<div style='text-align: center; padding:10px;'>{current_idx+1} / {len(search_results)}</div>", unsafe_allow_html=True)
                 with nav_col3:
                     if current_idx < len(search_results) - 1:
-                        if st.button("⬇️ Suivant", key="next_tiktok", use_container_width=True):
+                        if st.button(" Suivant", key="next_tiktok", use_container_width=True):
                             st.session_state.current_video_index = current_idx + 1
                             st.session_state.selected_video = search_results[current_idx + 1]
                             st.rerun()
 
-        with st.expander("⬇️ Télécharger cette vidéo"):
+        with st.expander(" Télécharger cette vidéo"):
             if platform == 'youtube':
                 st.markdown("**Y2mate** (YouTube)")
                 video_url_encoded = urllib.parse.quote(video['url'])
@@ -909,7 +909,7 @@ elif st.session_state.page == 'lecture' and st.session_state.selected_video:
         st.markdown("---")
 
     with col2:
-        st.markdown("### 🌐 Traduction du titre")
+        st.markdown("###  Traduction du titre")
         langue_nom = st.selectbox(
             "Langue cible :",
             options=list(langues_traduction.keys()),
@@ -925,12 +925,12 @@ elif st.session_state.page == 'lecture' and st.session_state.selected_video:
                 st.session_state.translated_description = traduire_texte(desc_text, nouvelle_langue)
             st.rerun()
 
-        if st.button("🔄 Réinitialiser la traduction"):
+        if st.button(" Réinitialiser la traduction"):
             st.session_state.translated_title = None
             st.session_state.translated_description = None
             st.rerun()
 
-        st.markdown("### 📺 Suggestions")
+        st.markdown("### Suggestions")
         suggestions = []
         if platform == 'youtube':
             if st.session_state.search_results:
@@ -949,7 +949,7 @@ elif st.session_state.page == 'lecture' and st.session_state.selected_video:
                         st.markdown(f"**{sug['title'][:50]}{'...' if len(sug['title']) > 50 else ''}**")
                         st.caption(sug['channel'][:30])
                     with col_btn:
-                        if st.button("▶️ Watch", key=f"watch_{sug['id']}", use_container_width=True):
+                        if st.button(" Watch", key=f"watch_{sug['id']}", use_container_width=True):
                             st.session_state.selected_video = sug
                             st.session_state.page = 'lecture'
                             st.session_state.translated_title = None
@@ -959,16 +959,16 @@ elif st.session_state.page == 'lecture' and st.session_state.selected_video:
             st.info("Aucune suggestion pour le moment.")
 
 elif st.session_state.page == 'traducteur':
-    st.markdown("## 🎙️ Traduction automatique de vidéo")
+    st.markdown("##  Traduction automatique de vidéo")
     st.write("Téléchargez une vidéo et choisissez la langue de doublage.")
 
     # Vérifier que ffmpeg est disponible
     if not shutil.which("ffmpeg"):
-        st.error("❌ ffmpeg n'est pas installé sur le système. La traduction vidéo est impossible.")
+        st.error(" ffmpeg n'est pas installé sur le système. La traduction vidéo est impossible.")
         st.stop()
 
-    video_file = st.file_uploader("📂 Upload vidéo", type=["mp4", "mov", "avi", "mkv"])
-    selected_language = st.selectbox("🌍 Langue cible du doublage (80 langues disponibles)", options=list(langues_tts.keys()))
+    video_file = st.file_uploader(" Upload vidéo", type=["mp4", "mov", "avi", "mkv"])
+    selected_language = st.selectbox(" Langue cible du doublage (80 langues disponibles)", options=list(langues_tts.keys()))
     target_language_code = langues_tts[selected_language]
 
     if video_file:
@@ -1009,7 +1009,7 @@ elif st.session_state.page == 'traducteur':
                         # Vérifier si la langue est supportée par gTTS
                         supported = get_gtts_supported_langs()
                         if target_language_code not in supported:
-                            st.warning(f"⚠️ La langue '{selected_language}' n'est pas supportée par gTTS. Utilisation de l'anglais (en) à la place.")
+                            st.warning(f" La langue '{selected_language}' n'est pas supportée par gTTS. Utilisation de l'anglais (en) à la place.")
                             target_language_code = 'en'
                         tts = gTTS(text=translated_text, lang=target_language_code)
                         tts.save(translated_audio)
@@ -1035,12 +1035,12 @@ elif st.session_state.page == 'traducteur':
                     st.error(f"Erreur lors de l'assemblage vidéo :\n{e.stderr}")
                     st.stop()
 
-                st.success("✅ Vidéo traduite avec succès !")
+                st.success("Vidéo traduite avec succès !")
                 st.video(output_video)
 
                 with open(output_video, "rb") as f:
                     st.download_button(
-                        "⬇️ Télécharger la vidéo traduite",
+                        " Télécharger la vidéo traduite",
                         f,
                         file_name="video_traduite.mp4",
                         mime="video/mp4"
@@ -1050,7 +1050,7 @@ elif st.session_state.page == 'traducteur':
 st.markdown("---")
 st.markdown(
     "<div style='text-align: center; color: #6c757d; padding: 1rem;'>"
-    "🎬 MediaFusion • YouTube & TikTok • Traduction IA (80 langues) • Doublage (Ewe, Yoruba, Shona, Akan inclus)"
+    "MediaFusion • YouTube & TikTok • Traduction IA (80 langues) • Doublage (Ewe, Yoruba, Shona, Akan inclus)"
 
     "<div style='text-align: center; color: #007bff; padding: 1rem;'>"
     "By BOTRE LARE Aboudou"
