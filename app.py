@@ -413,6 +413,8 @@ def traduire_texte(texte, langue_cible, source='auto'):
         st.warning(f"Erreur de traduction : {e}")
         return texte
 
+
+
 def traduire_texte_long(texte, langue_cible, source='auto', max_chars=5000):
     if not texte:
         return ""
