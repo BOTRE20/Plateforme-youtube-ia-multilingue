@@ -626,6 +626,7 @@ def display_video_grid(videos, cols=3, source='search'):
         st.info("Aucune vidéo à afficher.")
         return
 
+
     rows = [videos[i:i+cols] for i in range(0, len(videos), cols)]
     for row_idx, row in enumerate(rows):
         columns = st.columns(cols)
