@@ -6,6 +6,7 @@ import urllib.parse
 import json
 import re
 import random
+import time
 from datetime import datetime
 from deep_translator import GoogleTranslator
 import os
@@ -314,6 +315,23 @@ if 'trending_time_filter' not in st.session_state:
 
 langues_traduction = {
     "Français": "fr",
+    "Chinois ": "zh-CN",
+    "Anglais": "en",
+    "Indonésien": "id",
+    "Islandais": "is",
+     "Italien": "it",
+    "Hébreu": "iw",
+    "Japonais": "ja",
+    "Javanais": "jw",
+    "Khmer": "km",
+    "Kannada": "kn",
+    "Coréen": "ko",
+    "Latin": "la",
+    "Lituanien": "lt",
+    "Letton": "lv",
+    "Malayalam": "ml",
+    "Marathi": "mr",
+    "Malais": "ms",
     "Haoussa": "ha",
     "Yoruba": "yo",
     "Ewe": "ee",
@@ -332,7 +350,6 @@ langues_traduction = {
     "Danois": "da",
     "Allemand": "de",
     "Grec": "el",
-    "Anglais": "en",
     "Espagnol": "es",
     "Estonien": "et",
     "Basque": "eu",
@@ -342,21 +359,6 @@ langues_traduction = {
     "Hindi": "hi",
     "Croate": "hr",
     "Hongrois": "hu",
-    "Indonésien": "id",
-    "Islandais": "is",
-    "Italien": "it",
-    "Hébreu": "iw",
-    "Japonais": "ja",
-    "Javanais": "jw",
-    "Khmer": "km",
-    "Kannada": "kn",
-    "Coréen": "ko",
-    "Latin": "la",
-    "Lituanien": "lt",
-    "Letton": "lv",
-    "Malayalam": "ml",
-    "Marathi": "mr",
-    "Malais": "ms",
     "Birman": "my",
     "Népalais": "ne",
     "Néerlandais": "nl",
@@ -376,7 +378,6 @@ langues_traduction = {
     "Telugu": "te",
     "Thaï": "th",
     "Filipino": "tl",
-
     "Turc": "tr",
     "Ukrainien": "uk",
     "Ourdou": "ur",
@@ -403,37 +404,175 @@ def load_hf_tts_model(model_name):
 def get_gtts_supported_langs():
     return tts_langs()
 
+
+# =====================================================================
+# TRADUCTION (corrigée) : plusieurs moteurs essayés les uns après les
+# autres pour éviter l'erreur « too many requests » de Google.
+# =====================================================================
+HEADERS_TRAD = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/120.0 Safari/537.36"
+}
+
+
+def _decouper(texte, n):
+    """Découpe un texte en morceaux de n caractères max (de préférence aux fins de phrases)."""
+    phrases = re.split(r'(?<=[.!?])\s+', texte)
+    morceaux, courant = [], ""
+    for p in phrases:
+        while len(p) > n:
+            if courant:
+                morceaux.append(courant.strip())
+                courant = ""
+            morceaux.append(p[:n])
+            p = p[n:]
+        if len(courant) + len(p) + 1 <= n:
+            courant += p + " "
+        else:
+            if courant.strip():
+                morceaux.append(courant.strip())
+            courant = p + " "
+    if courant.strip():
+        morceaux.append(courant.strip())
+    return morceaux
+
+
+# Moteur 1 : API officielle Google (si une clé est fournie dans les secrets Streamlit)
+def _trad_google_officiel(texte, cible, source):
+    try:
+        cle = st.secrets["GOOGLE_TRANSLATE_API_KEY"]
+    except Exception:
+        raise RuntimeError("pas de clé GOOGLE_TRANSLATE_API_KEY")
+    sortie = []
+    for m in _decouper(texte, 4500):
+        data = {"q": m, "target": cible, "format": "text", "key": cle}
+        if source != "auto":
+            data["source"] = source
+        r = requests.post("https://translation.googleapis.com/language/translate/v2",
+                          data=data, timeout=20)
+        r.raise_for_status()
+        sortie.append(r.json()["data"]["translations"][0]["translatedText"])
+    return " ".join(sortie)
+
+
+# Moteur 2 : Google via deep_translator
+def _trad_google_deep(texte, cible, source):
+    sortie = []
+    for m in _decouper(texte, 4500):
+        sortie.append(GoogleTranslator(source=source, target=cible).translate(m))
+        time.sleep(0.3)
+    return " ".join(s for s in sortie if s)
+
+
+# Moteur 3 : Google (point d'accès gratuit direct)
+def _trad_google_gtx(texte, cible, source):
+    sortie = []
+    for m in _decouper(texte, 1500):
+        r = requests.get(
+            "https://translate.googleapis.com/translate_a/single",
+            params={"client": "gtx", "sl": source, "tl": cible, "dt": "t", "q": m},
+            headers=HEADERS_TRAD, timeout=15)
+        r.raise_for_status()
+        sortie.append("".join(seg[0] for seg in r.json()[0] if seg[0]))
+        time.sleep(0.4)
+    return " ".join(sortie)
+
+
+# Moteur 4 : Lingva (miroirs publics de Google Translate)
+LINGVA_INSTANCES = [
+    "https://lingva.ml",
+    "https://lingva.thedaviddelta.com",
+    "https://translate.plausibility.cloud",
+]
+
+
+def _trad_lingva(texte, cible, source):
+    corr = {"zh-CN": "zh", "zh-TW": "zh_HANT"}
+    cible, source = corr.get(cible, cible), corr.get(source, source)
+    derniere = None
+    for base in LINGVA_INSTANCES:
+        try:
+            sortie = []
+            for m in _decouper(texte, 900):
+                url = f"{base}/api/v1/{source}/{cible}/{urllib.parse.quote(m, safe='')}"
+                r = requests.get(url, headers=HEADERS_TRAD, timeout=20)
+                r.raise_for_status()
+                sortie.append(r.json()["translation"])
+                time.sleep(0.3)
+            return " ".join(sortie)
+        except Exception as e:
+            derniere = e
+    raise RuntimeError(f"toutes les instances Lingva ont échoué ({derniere})")
+
+
+# Moteur 5 : MyMemory (API directe, codes à 2 lettres)
+def _trad_mymemory(texte, cible, source):
+    corr = {"iw": "he", "jw": "jv"}
+    cible, source = corr.get(cible, cible), corr.get(source, source)
+    src = "Autodetect" if source == "auto" else source
+    sortie = []
+    for m in _decouper(texte, 450):
+        r = requests.get("https://api.mymemory.translated.net/get",
+                         params={"q": m, "langpair": f"{src}|{cible}"},
+                         headers=HEADERS_TRAD, timeout=15)
+        r.raise_for_status()
+        j = r.json()
+        t = j.get("responseData", {}).get("translatedText", "")
+        if str(j.get("responseStatus")) != "200" or "MYMEMORY WARNING" in t:
+            raise RuntimeError(t or "réponse invalide")
+        sortie.append(t)
+        time.sleep(0.3)
+    return " ".join(sortie)
+
+
+MOTEURS_TRADUCTION = [
+    ("Google (API officielle)", _trad_google_officiel),
+    ("Google", _trad_google_deep),
+    ("Google (direct)", _trad_google_gtx),
+    ("Lingva", _trad_lingva),
+    ("MyMemory", _trad_mymemory),
+]
+
+
+@st.cache_data(show_spinner=False, ttl=3600)
+def _traduire_cache(texte, langue_cible, source):
+    """Essaie chaque moteur jusqu'à obtenir une traduction. Résultats mis en cache 1 h."""
+    erreurs = []
+    for nom, fonction in MOTEURS_TRADUCTION:
+        try:
+            resultat = fonction(texte, langue_cible, source)
+            if resultat and resultat.strip():
+                return resultat
+            erreurs.append(f"{nom} : résultat vide")
+        except Exception as e:
+            erreurs.append(f"{nom} : {str(e)[:120]}")
+    raise RuntimeError("Tous les moteurs de traduction ont échoué.\n- " + "\n- ".join(erreurs))
+
+
 def traduire_texte(texte, langue_cible, source='auto'):
     if not texte or texte.strip() == "":
         return texte
     try:
-        translator = GoogleTranslator(source=source, target=langue_cible)
-        return translator.translate(texte)
+        return _traduire_cache(texte, langue_cible, source)
     except Exception as e:
         st.warning(f"Erreur de traduction : {e}")
         return texte
 
 
-
-def traduire_texte_long(texte, langue_cible, source='auto', max_chars=5000):
+def traduire_texte_long(texte, langue_cible, source='auto', max_chars=4500):
     if not texte:
         return ""
     if len(texte) <= max_chars:
         return traduire_texte(texte, langue_cible, source)
 
-    sentences = re.split(r'(?<=[.!?])\s+', texte)
+    morceaux = _decouper(texte, max_chars)
     translated_parts = []
-    current_chunk = ""
-
-    for sentence in sentences:
-        if len(current_chunk) + len(sentence) + 1 <= max_chars:
-            current_chunk += sentence + " "
-        else:
-            if current_chunk:
-                translated_parts.append(traduire_texte(current_chunk.strip(), langue_cible, source))
-            current_chunk = sentence + " "
-    if current_chunk:
-        translated_parts.append(traduire_texte(current_chunk.strip(), langue_cible, source))
+    barre = st.progress(0, text="Traduction du texte...")
+    for i, morceau in enumerate(morceaux):
+        translated_parts.append(traduire_texte(morceau, langue_cible, source))
+        barre.progress((i + 1) / len(morceaux), text=f"Traduction : partie {i+1}/{len(morceaux)}")
+        time.sleep(0.5)  # pause pour respecter les limites de requêtes
+    barre.empty()
 
     return " ".join(translated_parts)
 
