@@ -156,8 +156,7 @@ def get_gtts_supported_langs():
     return tts_langs()
 
 
-# =====================  TRADUCTION  =====================
-
+#  TRADUCTION 
 HEADERS_TRAD = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/120.0 Safari/537.36"
@@ -351,7 +350,7 @@ def generer_parole_par_morceaux(pipeline_tts, texte, taille_morceau=200):
     return np.concatenate(parties_audio), freq
 
 
-# =====================  RECHERCHE VIDÉOS  =====================
+#  RECHERCHE VIDÉOS  
 
 def search_youtube_videos(query, max_results=15, time_filter=None):
     if not query or query.strip() == "":
@@ -497,7 +496,7 @@ def search_tiktok_videos(query, max_results=15):
     return [], erreur
 
 
-# =====================  AFFICHAGE  =====================
+#  AFFICHAGE  
 
 def afficher_video(video):
     platform = video.get('platform', 'youtube')
@@ -571,7 +570,7 @@ def display_video_grid(videos, cols=3, source='search'):
                         st.rerun()
 
 
-# =====================  BARRE LATÉRALE  =====================
+#  BARRE LATÉRALE  
 
 with st.sidebar:
     st.markdown('<div style="font-size:1.5rem;font-weight:700;color:#FF0000;text-align:center;'
@@ -595,7 +594,7 @@ with st.sidebar:
             st.rerun()
 
 
-# =====================  PAGES  =====================
+#  PAGES 
 
 page = st.session_state.page
 
@@ -655,7 +654,7 @@ if page == 'accueil':
             display_video_grid(rec_videos, cols=3, source='reco')
 
 elif page == 'recherche':
-    st.markdown("## 🔍 Recherche multi-plateformes")
+    st.markdown("## Recherche multi-plateformes")
 
     plateforme = st.radio("Choisissez la plateforme :", options=["YouTube", "TikTok"], horizontal=True)
     search_query = st.text_input("Rechercher des vidéos :", placeholder="Entrez des mots-clés...",
@@ -753,7 +752,7 @@ elif page == 'lecture' and st.session_state.selected_video:
                 st.markdown(f"<div style='text-align:center;padding:10px;'>{idx + 1} / {len(liste)}</div>",
                             unsafe_allow_html=True)
             with n3:
-                if idx < len(liste) - 1 and st.button("Suivant ⏭", key="next_vid", use_container_width=True):
+                if idx < len(liste) - 1 and st.button("Suivant ", key="next_vid", use_container_width=True):
                     ouvrir_video(liste[idx + 1], source=src, index=idx + 1)
                     st.rerun()
 
@@ -917,8 +916,10 @@ elif page == 'traducteur':
                     st.download_button("⬇ Télécharger la vidéo traduite", f,
                                        file_name="video_traduite.mp4", mime="video/mp4")
 
-# --- Pied de page ---
-st.markdown("---")
+
+# --- Pied de page 
+st.markdown("--")
+
 st.markdown(
     "<div style='text-align:center;color:#6c757d;padding:1rem;'>"
     "MediaFusion • YouTube & TikTok • Traduction IA (80 langues) • Doublage (Ewe, Yoruba, Shona, Akan inclus)"
