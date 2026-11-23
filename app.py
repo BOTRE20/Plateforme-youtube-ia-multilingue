@@ -917,6 +917,7 @@ elif page == 'traducteur':
                                        file_name="video_traduite.mp4", mime="video/mp4")
 
 
+
 # --- Pied de page 
 st.markdown("--")
 
